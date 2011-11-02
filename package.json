@@ -1,0 +1,26 @@
+{
+    "author": "Michael Jackson <mjijackson@gmail.com>",
+    "name": "experiment",
+    "description": "A simple framework for running UI experiments in web apps",
+    "version": "0.0.0",
+    "repository": {
+        "url": ""
+    },
+    "main": "lib",
+    "scripts": {
+        "test": "vows test/*_test.js"
+    },
+    "engines": {
+        "node": "~0.4.7"
+    },
+    "dependencies": {
+        "usererror": "1.0.0",
+        "strata": "~0.7.0",
+        "mysql": "0.9.4",
+        "sprintf": "0.1.1"
+    },
+    "devDependencies": {
+        "vows": "0.5.12"
+    },
+    "private": true
+}
