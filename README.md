@@ -11,6 +11,22 @@ The configuration object may have the following keys:
                     Each value defines the set of users that are subject to that
                     experiment.
 
+A sample configuration object might look like the following:
+
+    {
+        "groups": {
+            "family search": [1, 2, 3, 4]
+        },
+        "experiments": {
+            "feature one": "10%",
+            "feature two": ["family_search", "10%"],
+            "feature three": {
+                "variant_one": "20%",
+                "variant_two": "80%"
+            }
+        }
+    }
+
 ## Installation
 
 Assuming you have a working installation of [node.js](http://nodejs.org/) and
