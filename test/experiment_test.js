@@ -5,15 +5,27 @@ var assert = require("assert"),
 vows.describe("experiment").addBatch({
     "A new Experiment": {
         topic: new Experiment,
-        "should not have a default id": function (ex) {
+        "should not have an id": function (ex) {
             assert.isUndefined(ex.id);
         },
-        "should not have a default name": function (ex) {
+        "should not have a name": function (ex) {
             assert.isUndefined(ex.name);
+        },
+        "should not be live": function (ex) {
+            assert.ok(!ex.live);
         }
     },
     "A new Experiment with a name": {
         topic: new Experiment({name: "Build a better mouse trap!"}),
+        "should not have an id": function (ex) {
+            assert.isUndefined(ex.id);
+        },
+        "should have a name": function (ex) {
+            assert.ok(ex.name);
+        },
+        "should not be live": function (ex) {
+            assert.ok(!ex.live);
+        },
         "when saved": {
             topic: function (ex) {
                 this.ex = ex;
@@ -26,19 +38,36 @@ vows.describe("experiment").addBatch({
                 assert.ok(this.ex);
                 assert.ok(this.ex.id);
             },
-            "and altered and saved again": {
+            "and saved again": {
                 topic: function (ex) {
                     this.id = ex.id;
-                    this.ex = ex;
-                    ex.name = "Do something else.";
-                    ex.save(this.callback);
+                    var self = this;
+                    ex.save(function (err) {
+                        self.callback(err, ex);
+                    });
                 },
-                "should succeed": function (err) {
+                "should succeed": function (err, ex) {
                     assert.ok(!err);
                 },
-                "should not alter the id": function (err) {
-                    assert.ok(this.ex);
-                    assert.equal(this.id, this.ex.id);
+                "should not alter the id": function (err, ex) {
+                    assert.ok(ex);
+                    assert.equal(this.id, ex.id);
+                },
+                "and fetched fresh from the database": {
+                    topic: function (err, ex) {
+                        this.id = ex.id;
+                        this.name = ex.name;
+                        this.live = ex.live;
+                        Experiment.find(ex.id, this.callback);
+                    },
+                    "should succeed": function (err, ex) {
+                        assert.ok(!err);
+                    },
+                    "should set the correct attributes": function (err, ex) {
+                        assert.ok(ex);
+                        assert.strictEqual(ex.live, this.live);
+                        assert.strictEqual(ex.name, this.name);
+                    }
                 }
             }
         }
