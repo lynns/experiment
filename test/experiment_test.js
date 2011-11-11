@@ -1,6 +1,13 @@
 var assert = require("assert"),
     vows = require("vows"),
-    Experiment = require("./../lib/experiment");
+    Experiment = require("./../lib/experiment"),
+    Variant = require("./../lib/variant");
+
+var guid = 1;
+
+function uniqueExperimentName() {
+    return "Experiment " + guid++;
+}
 
 vows.describe("experiment").addBatch({
     "A new Experiment": {
@@ -16,7 +23,7 @@ vows.describe("experiment").addBatch({
         }
     },
     "A new Experiment with a name": {
-        topic: new Experiment({name: "Build a better mouse trap!"}),
+        topic: new Experiment({name: uniqueExperimentName()}),
         "should not have an id": function (ex) {
             assert.isUndefined(ex.id);
         },
@@ -37,6 +44,32 @@ vows.describe("experiment").addBatch({
             "should update the experiment with an id": function (err) {
                 assert.ok(this.ex);
                 assert.ok(this.ex.id);
+            },
+            "with two variants": {
+                topic: function (ex) {
+                    var self = this, n = 2, c = 0;
+
+                    function tryCallback() {
+                        c += 1;
+                        if (c == n) {
+                            ex.variants(self.callback);
+                        }
+                    }
+
+                    for (var i = 0; i < n; ++i) {
+                        this["va" + i] = new Variant({experimentId: ex.id});
+                        this["va" + i].save(function (err) {
+                            tryCallback();
+                        });
+                    }
+                },
+                "should succeed": function (err, variants) {
+                    assert.ok(!err);
+                },
+                "should have two variants": function (err, variants) {
+                    assert.ok(variants);
+                    assert.equal(2, variants.length);
+                }
             },
             "and saved again": {
                 topic: function (ex) {
