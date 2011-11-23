@@ -1,114 +1,136 @@
-This package is a simple framework for building UI experiments in web apps.
-
-## Configuration
-
-The configuration object may have the following keys:
-
-  - groups          This should be an object keyed by the name of a group of
-                    users. The value of each key should be an array of the id's
-                    of users that belong to that group.
-  - experiments     This is an object keyed by the names of the experiments.
-                    Each value defines the set of users that are subject to that
-                    experiment.
-
+This package is a simple framework for building experiments in node apps. The
+purpose is to be able to run certain segments of code only when a user who is
+part of a certain experiment is using the app.
 
 ## Guiding Principles
 
-* Make it easy
-  * for devs to declare experiments
+Make it easy:
+
+  * for developers to declare experiments
   * to enable an experimental feature by:
     * 'everyone'
     * user ID
     * group name
-    * % range  (user ID % 100 within range)
+    * % range (user ID % 100 within range)
 
-* Make it hard
-  * for unwanted code to run on accident
+Make it difficult:
 
+  * for unwanted code to run by accident
 
-## Responsibilities
+## Overview
 
-The _Configuration_ files maps features to user groups. An _Experiment Context_
-shows which features and variants are "enabled", and an experiment context
-can be created by providing an id. The _Code Protections_ shows portions of
-the view or executes parts of the controller based on the current
-_Experiment Context_. _Application Developers_ never use any programming constructs
-(like `if` or `case`) to decide if features or variations run -- that's decided
-entirely by the _Experiment Framework_.
+The _Configuration_ file maps features to user groups. An _Experiment Context_
+shows which features and variants are "enabled". It is created by providing a
+user id. The framework provides methods that allow the developer to show
+portions of the view or execute parts of the controller based on a given
+_Experiment Context_. Application developers never use any programming
+constructs (like `if` or `case`) to decide if features or variations run --
+that's decided entirely by the framework.
 
-The _Experiment Framework_ doesn't know about HTTP frameworks. It doesn't communicate
-externally to report usage. _Applications_ tie results into their own HTTP frameworks
-and reporting tools.
+The framework doesn't know or care about the rest of the server environment
+including HTTP variables and such. It doesn't communicate externally to report
+usage or store its data in a database. Instead, applications tie results into
+their own frameworks and reporting tools.
+
+## Configuration
+
+Configuration is accomplished by means of a configuration object with the
+following properties:
+
+  - groups          An object keyed by the name of a group of users.
+  - experiments     An object keyed by the names of the experiments.
 
 A sample configuration object might look like the following:
 
     {
         "groups": {
-            "family search": [1, 2, 3, 4]
-          , "phase 1"  : "20...30%"
-          , "phase 2"  : "20...50%"
-          , "phase 3"  : "20...60%"
+            "family search": [1, 2, 3, 4],
+            "phase 1": "20-30%",
+            "phase 2": "20-50%",
+            "phase 3": "20-60%"
         },
         "experiments": {
             "feature one": "phase 1",
-            "feature two": ["family_search", "3...5%"],
+            "feature two": ["family search", "3-5%"],
             "feature three": {
-                "variant_one": "0...20%",
-                "variant_two": "20...100%"
+                "variant one": "0-20%",
+                "variant two": "21-100%"
             }
         }
     }
-    
 
-Resolving the experiment list for the current user:
+Each property of the `groups` object specifies the name of a group of users. It
+may have any of the following values:
 
-    // Resolve experiment before each code block
-    var experiment_context = experiment.user_context(user_id);
+  * A user id
+  * A percentage of users
+  * An array of user id(s) and/or a percentage of users
 
-    // App can memoize this
-    req.experiment_context = experiment.user_context(user_id);
+Each property of the `experiments` object specifies the name of an experiment.
+It may have any of the following values:
 
+  * The name of a group or a percentage of users
+  * An array of group name(s) and/or a percentage of users
+  * An object containing the names of variants
 
-The context contains a list of which experiments are enabled for the user
-(and may contain other private data):
+If an experiment is configured with an object with several variants (the last
+option), each variant may specify any of the first two values in the above list.
+If an experiment is not configured with any variants, it is assigned a variant
+named "default" which is the default variant for that experiment.
 
-    > var experiment_context = experiment.user_context(user_id);
-    > console.log( experiment_context.experiments );
-    ["feature one", "feature three/variant_one"]
+A percentage of users may be specified either as a single value (e.g. "10%") or
+a range of values (e.g. "20-30%"). In the first case the lower bound of the
+range is assumed to be 0. Also note that the special group name "everyone" is
+an alias for "100%".
 
+## Usage
 
-To protect your controller code:
+The basic pattern of usage has three steps:
 
-    var experiment = require('experiment');
+  1. Configure all groups and experiments.
+  2. Create a context for the current user.
+  3. Use that context to determine if a portion of the code should run or not.
 
-    // Assuming it's been previously memoized elsewhere
-    var context = req.experiment_context;
+The example below shows how all three steps can be used inside some controller
+code to limit a function to running only for users who are part of a given
+experiment.
 
-    // Pass a function when not using variants
-    experiment.feature("feature one", context, function() {
+    var experiment = require("experiment");
+    experiment.configureFromFile("config.json");
 
+    // Create a context with the id of the current user.
+    var context = experiment.contextFor(userId);
+
+    // Specify a portion of code that is protected from running if the user
+    // in the given `context` is not part of the experiment with the given name.
+    experiment.protect("feature one", context, function () {
+        // This code runs if the user is part of the experiment.
     });
 
+    experiment.protect("feature three/variant one", context, function () {
+        // This code runs if the user is part of variant one
+        // of the experiment.
+    });
 
-    // Pass an object with declared variants
-    experiment.feature("feature three", context, {
+In addition to protecting a plain function, you can also use an object that
+specifies callbacks that will be run when the user is part of a certain variant.
 
-      "variant_one": function() {
+    experiment.protect("feature one", context, {
+        "variant one": function () {
+            // This code runs if the user is part of variant one.
+        },
+        "variant two": function () {
+            // This code runs if the user is part of variant two.
+        }
+    });
 
-      },
+## TODO
 
-      "variant_two": function() {
-
-      }
-
-    });   
-    
-
-To protect your view code:
+Make something like this work with ejs:
 
     <h1><%= title %></h1>
     <p>
-      <% experiment.feature("button_color", context, { %>
+      <% experiment.protect("button_color", context, { %>
 
          <% "red_button": function() { %>
             <a class="button error">Click</a>
@@ -121,10 +143,9 @@ To protect your view code:
       <% }); %>
     </p>
 
-    <% experiment.feature("invite_friends", context, function(){ %>
+    <% experiment.protect("invite_friends", context, function(){ %>
       <p>Invite your friends!! <a href="#">Get Started</a>.</p>
     <% }); %>
-
 
 ## Installation
 
@@ -140,3 +161,5 @@ To run the tests, first make sure you install all of the package's dependencies
 (see Installation above).
 
 Next, use [vows](http://vowsjs.org/) to run the test suite.
+
+    $ vows test/*_test.js
