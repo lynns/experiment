@@ -130,16 +130,13 @@ Make something like this work with ejs:
 
     <h1><%= title %></h1>
     <p>
-      <% experiment.protect("button_color", context, { %>
-
-         <% "red_button": function() { %>
-            <a class="button error">Click</a>
-         <% }, %>
-
-         <% "green_button": function() { %>
-            <a class="button go">Click</a>
-         <% }, %>
-
+      <% experiment.protect("button color", context, { %>
+        <% "red button": function () { %>
+          <a class="button error">Click</a>
+        <% }, %>
+        <% "green button": function () { %>
+          <a class="button go">Click</a>
+        <% } %>
       <% }); %>
     </p>
 

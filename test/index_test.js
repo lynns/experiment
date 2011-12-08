@@ -46,36 +46,150 @@ vows.describe("experiment").addBatch({
                 assert.equal(featureThree.variants.length, 2);
             },
             "protect": {
-                "for a user id that is not part of the experiment": {
-                    topic: function () {
-                        var context = experiment.contextFor(11);
-                        var data = "no";
+                "when called with an experiment name and a single function": {
+                    "for a user id that is NOT part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(11);
+                            var data = "no";
 
-                        experiment.protect("feature one", context, function () {
-                            data = "yes";
-                        });
+                            experiment.protect("feature one", context, function () {
+                                data = "yes";
+                            });
 
-                        return data;
+                            return data;
+                        },
+                        "should not call the callback": function (data) {
+                            assert.equal(data, "no");
+                        }
                     },
-                    "should not call the callback": function (data) {
-                        assert.equal(data, "no");
+                    "for a user id that IS part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(22);
+                            var data = "no";
+
+                            experiment.protect("feature one", context, function () {
+                                data = "yes";
+                            });
+
+                            return data;
+                        },
+                        "should call the callback": function (data) {
+                            assert.equal(data, "yes");
+                        }
                     }
                 },
-                "for a user id that is part of the experiment": {
-                    topic: function () {
-                        var context = experiment.contextFor(22);
-                        var data = "no";
 
-                        experiment.protect("feature one", context, function () {
-                            data = "yes";
-                        });
+                "when called with an experiment name and an object of variant name/function pairs": {
+                    "for a user id that is NOT part of the experiment/variant": {
+                        topic: function () {
+                            var context = experiment.contextFor(22);
+                            var data = "no";
 
-                        return data;
+                            experiment.protect("feature three", context, {
+                                "variant one": function () {
+                                    data = "yes";
+                                }
+                            });
+
+                            return data;
+                        },
+                        "should not call the callback": function (data) {
+                            assert.equal(data, "no");
+                        }
                     },
-                    "should call the callback": function (data) {
-                        assert.equal(data, "yes");
+                    "for a user id that IS part of the experiment/variant": {
+                        topic: function () {
+                            var context = experiment.contextFor(11);
+                            var data = "no";
+
+                            experiment.protect("feature three", context, {
+                                "variant one": function () {
+                                    data = "yes";
+                                }
+                            });
+
+                            return data;
+                        },
+                        "should call the callback": function (data) {
+                            assert.equal(data, "yes");
+                        }
+                    }
+                },
+
+                "when called with an experiment name/variant name and a single function": {
+                    "for a user id that is NOT part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(22);
+                            var data = "no";
+
+                            experiment.protect("feature three/variant one", context, function () {
+                                data = "yes";
+                            });
+
+                            return data;
+                        },
+                        "should not call the callback": function (data) {
+                            assert.equal(data, "no");
+                        }
+                    },
+                    "for a user id that IS part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(11);
+                            var data = "no";
+
+                            experiment.protect("feature three/variant one", context, function () {
+                                data = "yes";
+                            });
+
+                            return data;
+                        },
+                        "should call the callback": function (data) {
+                            assert.equal(data, "yes");
+                        }
+                    }
+                },
+
+                // This is not the intended use case, but should still work
+                // as the user intends it to -- that is, the variant name in
+                // the experiment/variant pair must match the name of the
+                // variant that is matched.
+                "when called with an experiment name/variant name and an object of variant name/function pairs": {
+                    "for a user id that is NOT part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(22);
+                            var data = "no";
+
+                            experiment.protect("feature three/variant one", context, {
+                                "variant one": function () {
+                                    data = "yes";
+                                }
+                            });
+
+                            return data;
+                        },
+                        "should not call the callback": function (data) {
+                            assert.equal(data, "no");
+                        }
+                    },
+                    "for a user id that IS part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(11);
+                            var data = "no";
+
+                            experiment.protect("feature three/variant one", context, {
+                                "variant one": function () {
+                                    data = "yes";
+                                }
+                            });
+
+                            return data;
+                        },
+                        "should call the callback": function (data) {
+                            assert.equal(data, "yes");
+                        }
                     }
                 }
+
             }
         }
     }
