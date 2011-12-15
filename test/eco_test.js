@@ -3,6 +3,7 @@ var assert = require("assert"),
     path = require("path"),
     eco = require("eco"),
     experiment = require("./../lib");
+    eco_plugin = require("./../lib/eco_plugin");
 
 experiment.configure({
     experiments: {
@@ -29,12 +30,8 @@ vows.describe("eco").addBatch({
                 var context = experiment.contextFor(1);
 
                 var result = eco.render(template, {
-                  feature:   function(name, context, variation_builder) {
-                    return experiment.protect(name, context, variation_builder.run);
-                  },
-                  variation: function(name, thing) {
-                    this.__variations[name] = thing;
-                  },
+                  feature:   eco_plugin.feature,
+                  variation: eco_plugin.variation,
                   user_context: context
                 });
 
@@ -67,15 +64,8 @@ vows.describe("eco").addBatch({
                 var context = experiment.contextFor(1);
 
                 var result = eco.render(template, {
-                  feature:   function(name, context, variation_builder) {
-                    // Make this a stack later, to push nested @features ??
-                    this.__variations = {};
-                    variation_builder.variations();
-                    return experiment.protect(name, context, this.__variations);
-                  },
-                  variation: function(name, thing) {
-                    this.__variations[name] = thing;
-                  },
+                  feature:   eco_plugin.feature,
+                  variation: eco_plugin.variation,
                   user_context: context
                 });
 
