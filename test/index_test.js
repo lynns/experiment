@@ -113,13 +113,16 @@ vows.describe("experiment").addBatch({
                             experiment.protect("feature three", context, {
                                 "variant one": function () {
                                     data = "yes";
+                                },
+                                "fallback": function () {
+                                    data = "fallback";
                                 }
                             });
 
                             return data;
                         },
-                        "should not call the callback": function (data) {
-                            assert.equal(data, "no");
+                        "should call the fallback": function (data) {
+                            assert.equal(data, "fallback");
                         }
                     },
                     "for a user id that IS part of the experiment/variant": {
@@ -130,6 +133,9 @@ vows.describe("experiment").addBatch({
                             experiment.protect("feature three", context, {
                                 "variant one": function () {
                                     data = "yes";
+                                },
+                                "fallback": function () {
+                                    data = "fallback";
                                 }
                             });
 
@@ -187,13 +193,16 @@ vows.describe("experiment").addBatch({
                             experiment.protect("feature three/variant one", context, {
                                 "variant one": function () {
                                     data = "yes";
+                                },
+                                "fallback": function () {
+                                    data = "fallback";
                                 }
                             });
 
                             return data;
                         },
-                        "should not call the callback": function (data) {
-                            assert.equal(data, "no");
+                        "should call the fallback": function (data) {
+                            assert.equal(data, "fallback");
                         }
                     },
                     "for a user id that IS part of the experiment": {
@@ -204,6 +213,9 @@ vows.describe("experiment").addBatch({
                             experiment.protect("feature three/variant one", context, {
                                 "variant one": function () {
                                     data = "yes";
+                                },
+                                "fallback": function () {
+                                    data = "fallback";
                                 }
                             });
 
