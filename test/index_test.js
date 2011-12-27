@@ -46,6 +46,31 @@ vows.describe("experiment").addBatch({
                 assert.equal(featureThree.variants.length, 2);
             },
             "protect": {
+                "when called with an unknown experiment name": {
+                    topic: function () {
+                        var context = experiment.contextFor(11);
+                        var data = "no";
+
+                        this.log = "";
+                        var self = this;
+                        experiment.log = function (message) {
+                            self.log += message;
+                        }
+
+                        experiment.protect("non-existent feature", context, function () {
+                            data = "yes";
+                        });
+
+                        return data;
+                    },
+                    "should not call the callback": function (data) {
+                        assert.equal(data, "no");
+                    },
+                    "should write a message to the log": function (data) {
+                        assert.match(this.log, /undefined/i);
+                    }
+                },
+
                 "when called with an experiment name and a single function": {
                     "for a user id that is NOT part of the experiment": {
                         topic: function () {
