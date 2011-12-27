@@ -1,6 +1,7 @@
 var assert = require("assert"),
     vows = require("vows"),
     path = require("path"),
+    mustache = require("mustache"),
     experiment = require("./../lib"),
     Group = require("./../lib/group"),
     Experiment = require("./../lib/experiment");
@@ -45,6 +46,7 @@ vows.describe("experiment").addBatch({
                 var featureThree = Experiment.byName("feature three");
                 assert.equal(featureThree.variants.length, 2);
             },
+
             "protect": {
                 "when called with an unknown experiment name": {
                     topic: function () {
@@ -226,8 +228,42 @@ vows.describe("experiment").addBatch({
                         }
                     }
                 }
+            }, // protect
 
-            }
+            "select with a mustache template": {
+                topic: function () {
+                    var context = experiment.contextFor(11);
+
+                    var invited = experiment.select("feature three/variant one", context, {
+                        "variant one": function () {
+                            return function (text, render) {
+                                return render(text, this);
+                            };
+                        }
+                    });
+
+                    var view = {
+                        name: "Michael",
+                        invited: invited
+                    };
+
+                    var template = "" +
+                        "<p>" +
+                        "There's a New Year's Eve party at my house. " +
+                        "{{#invited}}" +
+                        "<strong>And you're invited, {{name}}!</strong>" +
+                        "{{/invited}}" +
+                        "{{^invited}}" +
+                        "<em>But you're not invited!</em>" +
+                        "{{/invited}}" +
+                        "</p>";
+
+                    return mustache.to_html(template, view);
+                },
+                "should render the template properly": function (text) {
+                    assert.equal(text, "<p>There's a New Year's Eve party at my house. <strong>And you're invited, Michael!</strong></p>");
+                }
+            } // select
         }
     }
 }).export(module);

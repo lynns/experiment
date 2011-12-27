@@ -124,25 +124,74 @@ specifies callbacks that will be run when the user is part of a certain variant.
         }
     });
 
-## TODO
+If the user needs to first determine whether or not any function can be called
+for a given user context, a lower-level `select` function is provided that will
+select the appropriate callback to use from an object of variant name/callback
+pairs. This can be useful when the code doesn't fit the `protect` use case,
+e.g.:
 
-Make something like this work with ejs:
+    var callback = experiment.select("feature one", context, {
+        "variant one": function () {
+            // This code runs if the user is part of variant one.
+        },
+        "variant two": function () {
+            // This code runs if the user is part of variant two.
+        }
+    });
 
-    <h1><%= title %></h1>
-    <p>
-      <% experiment.protect("button color", context, { %>
-        <% "red button": function () { %>
-          <a class="button error">Click</a>
-        <% }, %>
-        <% "green button": function () { %>
-          <a class="button go">Click</a>
-        <% } %>
-      <% }); %>
-    </p>
+    if (callback) {
+        callback();
+    }
 
-    <% experiment.protect("invite_friends", context, function(){ %>
-      <p>Invite your friends!! <a href="#">Get Started</a>.</p>
-    <% }); %>
+This can be very useful when the user needs to have a reference to the callback
+to pass to a template engine like [Mustache](http://mustache.github.com), for
+example.
+
+    var mustache = require("mustache");
+
+    // If the user in the given `context` is part of feature three/variant one,
+    // the `invited` variable will contain a function that is used as the value
+    // of the `invited` template variable.
+    var invited = experiment.select("feature three/variant one", context, {
+        "variant one": function () {
+            return function (text, render) {
+                return render(text, this);
+            };
+        }
+    });
+
+    var view = {
+        name: "Michael",
+        invited: invited
+    };
+
+    var template = "" +
+        "<p>" +
+        "There's a New Year's Eve party at my house. " +
+        "{{#invited}}" +
+        "<strong>And you're invited, {{name}}!</strong>" +
+        "{{/invited}}" +
+        "{{^invited}}" +
+        "<em>But you're not invited!</em>" +
+        "{{/invited}}" +
+        "</p>";
+
+    mustache.to_html(template, view);
+
+### Falling Back
+
+When there is a piece of code that you need to run when the user is *not* part
+of the given context, you may use a fallback function. A fallback function uses
+the special property name `fallback` inside the object of possible callbacks.
+
+    experiment.protect("feature one", context, {
+        "variant one": function () {
+            // This code runs if the user is part of variant one.
+        },
+        "fallback": function () {
+            // This code runs if the user is *not* part of variant one.
+        }
+    });
 
 ## Installation
 
