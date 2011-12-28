@@ -263,7 +263,57 @@ vows.describe("experiment").addBatch({
                 "should render the template properly": function (text) {
                     assert.equal(text, "<p>There's a New Year's Eve party at my house. <strong>And you're invited, Michael!</strong></p>");
                 }
-            } // select
+            }, // select
+
+            "feature": {
+                topic: function () {
+                    var context = experiment.contextFor(11);
+
+                    return experiment.feature("feature three", context);
+                },
+                "should return valid variant": function (variant) {
+                    assert.equal(variant, "variant one");
+                },
+                "should return truthy value": function (variant) {
+                    assert.isTrue(variant ? true : false);
+                }
+            },// feature
+
+            "feature with no variants": {
+                topic: function () {
+                    var context = experiment.contextFor(22);
+
+                    return experiment.feature("feature one", context);
+                },
+                "should return valid variant": function (variant) {
+                    assert.equal(variant, "default");
+                },
+                "should return truthy value": function (variant) {
+                    assert.isTrue(variant ? true : false);
+                }
+            },// feature
+
+            "feature with no matching variant": {
+                topic: function () {
+                    var context = experiment.contextFor(50);
+
+                    return experiment.feature("feature one", context);
+                },
+                "should return valid variant": function (variant) {
+                    assert.isFalse(variant);
+                }
+            }, // feature with no matching variant
+
+            "feature with invalid feature": {
+                topic: function () {
+                    var context = experiment.contextFor(50);
+
+                    return experiment.feature("feature that doesn't exist", context);
+                },
+                "should return valid variant": function (variant) {
+                    assert.isFalse(variant);
+                }
+            } // feature with invalid feature
         }
     }
 }).export(module);
