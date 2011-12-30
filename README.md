@@ -223,6 +223,37 @@ Or in an eco template:
       <h1>Default Title</h1>
     <% end %>
 
+## Conditional Usage
+
+For cases where you want to use the native conditional support of the language, 
+a `feature` function is provided.  The `feature` function takes in a feature name
+and context and returns either the name of the variant active for the given context,
+or false if no variants are active.  This can be useful in multiple ways, such as:
+
+In a controller class:
+
+    if(experiment.feature("feature one", ctx))
+      console.log("I'm in!!");
+
+    switch(experiment.feature("feature two", ctx)) {
+        case "variant 1":
+            console.log("Variant 1 is active");
+            break;
+        case "variant 2":
+            console.log("Variant 2 is active");
+            break;
+        default:
+            console.log("The default path is active");
+    }
+
+Or in an eco template:
+
+    <% if experiment.feature 'feature one', ctx: %>
+      <h1>Experimental Title</h1>
+    <% else: %>
+      <h1>Default Title</h1>
+    <% end %>
+
 ## Installation
 
 Assuming you have a working installation of [node.js](http://nodejs.org/) and

@@ -20,6 +20,8 @@
     "devDependencies": {
         "vows": "0.6.0",
         "mustache": "0.3.1-dev"
+        "ejs": "0.5.0",
+        "eco": "1.1.0-rc-1"
     },
     "private": true
 }
