@@ -11,6 +11,8 @@
         "feature three": {
             "variant one": "0-20%",
             "variant two": "21-100%"
-        }
+        },
+        "feature four": true,
+        "feature five": false
     }
 }

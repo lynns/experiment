@@ -3,15 +3,21 @@ var assert = require("assert"),
     path = require("path"),
     mustache = require("mustache"),
     experiment = require("./../lib"),
+    errors = require("./../lib/errors"),
     Group = require("./../lib/group"),
     Experiment = require("./../lib/experiment");
 
 vows.describe("experiment").addBatch({
     "configureFromFile": {
-        "with an invalid file should throw": function () {
+        "with a missing file should throw": function () {
             assert.throws(function () {
                 experiment.configureFromFile("./blah.json");
             }, /not exist/);
+        },
+        "with an invalid file should throw": function () {
+            assert.throws(function () {
+                experiment.configureFromFile("./badconfig.json");
+            }, errors.InvalidConfigurationError );
         },
         "with a valid file": {
             topic: function () {
@@ -302,7 +308,7 @@ vows.describe("experiment").addBatch({
                 "should return valid variant": function (variant) {
                     assert.isFalse(variant);
                 }
-            }, // feature with no matching variant
+            },
 
             "feature with invalid feature": {
                 topic: function () {
@@ -313,7 +319,29 @@ vows.describe("experiment").addBatch({
                 "should return valid variant": function (variant) {
                     assert.isFalse(variant);
                 }
-            } // feature with invalid feature
+            },
+
+            "feature with always on": {
+                topic: function () {
+                    var context = experiment.contextFor(50);
+
+                    return experiment.feature("feature four", context);
+                },
+                "should return valid variant": function (variant) {
+                    assert.isTrue(!!variant);
+                }
+            },
+
+            "feature with always off": {
+                topic: function () {
+                    var context = experiment.contextFor(50);
+
+                    return experiment.feature("feature five", context);
+                },
+                "should return false": function (variant) {
+                    assert.isFalse(variant);
+                }
+            }
         }
     }
 }).export(module);

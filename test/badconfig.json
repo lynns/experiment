@@ -1,0 +1,8 @@
+{
+    "experiments": {
+        "feature three": {
+            "variant one": "0-20%",
+            "variant two": true
+        }
+    }
+}

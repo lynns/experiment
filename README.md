@@ -8,7 +8,7 @@ Make it easy:
 
   * for developers to declare experiments
   * to enable an experimental feature by:
-    * 'everyone'
+    * true/false - on or off for everyone
     * user ID
     * group name
     * % range (user ID % 100 within range)
@@ -23,9 +23,7 @@ The _Configuration_ file maps features to user groups. An _Experiment Context_
 shows which features and variants are "enabled". It is created by providing a
 user id. The framework provides methods that allow the developer to show
 portions of the view or execute parts of the controller based on a given
-_Experiment Context_. Application developers never use any programming
-constructs (like `if` or `case`) to decide if features or variations run --
-that's decided entirely by the framework.
+_Experiment Context_.
 
 The framework doesn't know or care about the rest of the server environment
 including HTTP variables and such. It doesn't communicate externally to report
@@ -55,7 +53,8 @@ A sample configuration object might look like the following:
             "feature three": {
                 "variant one": "0-20%",
                 "variant two": "21-100%"
-            }
+            },
+            "feature four": true
         }
     }
 
@@ -71,6 +70,7 @@ It may have any of the following values:
 
   * The name of a group or a percentage of users
   * An array of group name(s) and/or a percentage of users
+  * A boolean indicating if the experiment is on or off for all users
   * An object containing the names of variants
 
 If an experiment is configured with an object with several variants (the last
@@ -80,8 +80,7 @@ named "default" which is the default variant for that experiment.
 
 A percentage of users may be specified either as a single value (e.g. "10%") or
 a range of values (e.g. "20-30%"). In the first case the lower bound of the
-range is assumed to be 0. Also note that the special group name "everyone" is
-an alias for "100%".
+range is assumed to be 0.
 
 ## Usage
 
@@ -192,6 +191,37 @@ the special property name `fallback` inside the object of possible callbacks.
             // This code runs if the user is *not* part of variant one.
         }
     });
+
+## Conditional Usage
+
+For cases where you want to use the native conditional support of the language, 
+a `feature` function is provided.  The `feature` function takes in a feature name
+and context and returns either the name of the variant active for the given context,
+or false if no variants are active.  This can be useful in multiple ways, such as:
+
+In a controller class:
+
+    if(experiment.feature("feature one", ctx))
+      console.log("I'm in!!");
+
+    switch(experiment.feature("feature two", ctx)) {
+        case "variant 1":
+            console.log("Variant 1 is active");
+            break;
+        case "variant 2":
+            console.log("Variant 2 is active");
+            break;
+        default:
+            console.log("The default path is active");
+    }
+
+Or in an eco template:
+
+    <% if experiment.feature 'feature one', ctx: %>
+      <h1>Experimental Title</h1>
+    <% else: %>
+      <h1>Default Title</h1>
+    <% end %>
 
 ## Installation
 

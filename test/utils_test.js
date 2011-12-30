@@ -1,6 +1,6 @@
 var assert = require("assert"),
     vows = require("vows"),
-    errors = require("./../lib/errors");
+    errors = require("./../lib/errors"),
     utils = require("./../lib/utils");
 
 var itWorksProperlyAnd = function(userId, vows) {
