@@ -48,13 +48,13 @@ A sample configuration object might look like the following:
             "phase 3": "20-60%"
         },
         "experiments": {
-            "feature one": "phase 1",
-            "feature two": ["family search", "3-5%"],
-            "feature three": {
-                "variant one": "0-20%",
-                "variant two": "21-100%"
+            "featureOne": "phase 1",
+            "featureTwo": ["family search", "3-5%"],
+            "featureThree": {
+                "variantOne": "0-20%",
+                "variantTwo": "21-100%"
             },
-            "feature four": true
+            "featureFour": true
         }
     }
 
@@ -90,9 +90,8 @@ The basic pattern of usage has three steps:
   2. Create a context for the current user.
   3. Use that context to determine if a portion of the code should run or not.
 
-The example below shows how all three steps can be used inside some controller
-code to limit a function to running only for users who are part of a given
-experiment.
+The example below shows how all three steps can be used inside some
+code with simple if statements.
 
     var experiment = require("experiment");
     experiment.configureFromFile("config.json");
@@ -102,26 +101,82 @@ experiment.
 
     // Specify a portion of code that is protected from running if the user
     // in the given `context` is not part of the experiment with the given name.
-    experiment.protect("feature one", context, function () {
-        // This code runs if the user is part of the experiment.
-    });
+    if( experiment.variantFor("featureOne", context) ) {
+        // This code runs if the user is part of ANY variant in the experiment.
+    } else {
+        // This code runs if the user is NOT part of the experiment.
+    }
 
-    experiment.protect("feature three/variant one", context, function () {
-        // This code runs if the user is part of variant one
+    if( experiment.variantFor("featureThree/variantOne", context) ) {
+        // This code runs if the user is part of variantOne
         // of the experiment.
-    });
+    }
 
-In addition to protecting a plain function, you can also use an object that
-specifies callbacks that will be run when the user is part of a certain variant.
+In addition to protecting code with an if statement, you can also use a
+switch statement to vary the code run for each variant.
 
-    experiment.protect("feature one", context, {
-        "variant one": function () {
-            // This code runs if the user is part of variant one.
-        },
-        "variant two": function () {
-            // This code runs if the user is part of variant two.
-        }
-    });
+    switch( experiment.variantFor("featureOne", context) ) {
+        "variantOne":
+            // This code runs if the user is part of variantOne.
+            break;
+        "variantTwo":
+            // This code runs if the user is part of variantTwo.
+            break;
+        default:
+            // This code runs if the user is not part of any variant of "featureOne"
+    }
+
+It works exactly the same way in EJS views:
+
+    <h1><%= title %></h1>
+    <p>
+      <% switch( experiment.variantFor("buttonColor", context) ) { %>
+        <% case "redButton": %>
+          <a class="button error">Click</a>
+        <%   break; %>
+        <% case "greenButton": %>
+          <a class="button go">Click</a>
+        <%   break; %>
+      <% } %>
+    </p>
+
+    <% if( experiment.variantFor("inviteFriends", context) ) { %>
+      <p>Invite your friends!! <a href="#">Get Started</a>.</p>
+    <% } %>
+
+
+## Conditional Usage
+
+For cases where you want to use the native conditional support of the language, 
+a `feature` function is provided.  The `feature` function takes in a feature name
+and context and returns either the name of the variant active for the given context,
+or false if no variants are active.  This can be useful in multiple ways, such as:
+
+In a controller class:
+
+    if(experiment.feature("feature one", ctx))
+      console.log("I'm in!!");
+
+    switch(experiment.feature("feature two", ctx)) {
+        case "variant 1":
+            console.log("Variant 1 is active");
+            break;
+        case "variant 2":
+            console.log("Variant 2 is active");
+            break;
+        default:
+            console.log("The default path is active");
+    }
+
+Or in an eco template:
+
+    <% if experiment.feature 'feature one', ctx: %>
+      <h1>Experimental Title</h1>
+    <% else: %>
+      <h1>Default Title</h1>
+    <% end %>
+
+### Selecting a Callback
 
 If the user needs to first determine whether or not any function can be called
 for a given user context, a lower-level `select` function is provided that will
@@ -192,67 +247,6 @@ the special property name `fallback` inside the object of possible callbacks.
         }
     });
 
-## Conditional Usage
-
-For cases where you want to use the native conditional support of the language, 
-a `feature` function is provided.  The `feature` function takes in a feature name
-and context and returns either the name of the variant active for the given context,
-or false if no variants are active.  This can be useful in multiple ways, such as:
-
-In a controller class:
-
-    if(experiment.feature("feature one", ctx))
-      console.log("I'm in!!");
-
-    switch(experiment.feature("feature two", ctx)) {
-        case "variant 1":
-            console.log("Variant 1 is active");
-            break;
-        case "variant 2":
-            console.log("Variant 2 is active");
-            break;
-        default:
-            console.log("The default path is active");
-    }
-
-Or in an eco template:
-
-    <% if experiment.feature 'feature one', ctx: %>
-      <h1>Experimental Title</h1>
-    <% else: %>
-      <h1>Default Title</h1>
-    <% end %>
-
-## Conditional Usage
-
-For cases where you want to use the native conditional support of the language, 
-a `feature` function is provided.  The `feature` function takes in a feature name
-and context and returns either the name of the variant active for the given context,
-or false if no variants are active.  This can be useful in multiple ways, such as:
-
-In a controller class:
-
-    if(experiment.feature("feature one", ctx))
-      console.log("I'm in!!");
-
-    switch(experiment.feature("feature two", ctx)) {
-        case "variant 1":
-            console.log("Variant 1 is active");
-            break;
-        case "variant 2":
-            console.log("Variant 2 is active");
-            break;
-        default:
-            console.log("The default path is active");
-    }
-
-Or in an eco template:
-
-    <% if experiment.feature 'feature one', ctx: %>
-      <h1>Experimental Title</h1>
-    <% else: %>
-      <h1>Default Title</h1>
-    <% end %>
 
 ## Installation
 

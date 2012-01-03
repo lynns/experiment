@@ -271,6 +271,144 @@ vows.describe("experiment").addBatch({
                 }
             }, // select
 
+            "variantFor": {
+                "when called with an experiment name and a single function": {
+                    "for a user id that is NOT part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(11);
+                            var data = "no";
+
+                            if( experiment.variantFor("feature one", context) ) {
+                                data = "yes";
+                            };
+
+                            return data;
+                        },
+                        "should not call the callback": function (data) {
+                            assert.equal(data, "no");
+                        }
+                    },
+                    "for a user id that IS part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(22);
+                            var data = "no";
+
+                            if( experiment.variantFor("feature one", context) ) {
+                                data = "yes";
+                            };
+
+                            return data;
+                        },
+                        "should call the callback": function (data) {
+                            assert.equal(data, "yes");
+                        }
+                    }
+                },
+
+                "when called with an experiment name and an object of variant name/function pairs": {
+                    "for a user id that is NOT part of the experiment/variant": {
+                        topic: function () {
+                            var context = experiment.contextFor(22);
+                            var data = "no";
+
+                            if( "variant one" === experiment.variantFor("feature three", context) ) {
+                                data = "yes";
+                            };
+
+                            return data;
+                        },
+                        "should not call the callback": function (data) {
+                            assert.equal(data, "no");
+                        }
+                    },
+                    "for a user id that IS part of the experiment/variant": {
+                        topic: function () {
+                            var context = experiment.contextFor(11);
+                            var data = "no";
+
+                            if( "variant one" === experiment.variantFor("feature three", context) ) {
+                                data = "yes";
+                            };
+
+                            return data;
+                        },
+                        "should call the callback": function (data) {
+                            assert.equal(data, "yes");
+                        }
+                    }
+                },
+
+                "when called with an experiment name/variant name and a single function": {
+                    "for a user id that is NOT part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(22);
+                            var data = "no";
+
+                            if( experiment.variantFor("feature three/variant one", context) ) {
+                                data = "yes";
+                            };
+
+                            return data;
+                        },
+                        "should not call the callback": function (data) {
+                            assert.equal(data, "no");
+                        }
+                    },
+                    "for a user id that IS part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(11);
+                            var data = "no";
+
+                            if( experiment.variantFor("feature three/variant one", context) ) {
+                                data = "yes";
+                            };
+
+                            return data;
+                        },
+                        "should call the callback": function (data) {
+                            assert.equal(data, "yes");
+                        }
+                    }
+                },
+
+                // This is not the intended use case, but should still work
+                // as the user intends it to -- that is, the variant name in
+                // the experiment/variant pair must match the name of the
+                // variant that is matched.
+                "when called with an experiment name/variant name and an object of variant name/function pairs": {
+                    "for a user id that is NOT part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(22);
+                            var data = "no";
+
+                            if( "variant one" === experiment.variantFor("feature three/variant one", context) ) {
+                                data = "yes";
+                            };
+
+                            return data;
+                        },
+                        "should not call the callback": function (data) {
+                            assert.equal(data, "no");
+                        }
+                    },
+                    "for a user id that IS part of the experiment": {
+                        topic: function () {
+                            var context = experiment.contextFor(11);
+                            var data = "no";
+
+                            if( "variant one" === experiment.variantFor("feature three/variant one", context) ) {
+                                data = "yes";
+                            };
+
+                            return data;
+                        },
+                        "should call the callback": function (data) {
+                            assert.equal(data, "yes");
+                        }
+                    }
+                }
+            }, // variantFor
+
             "feature": {
                 topic: function () {
                     var context = experiment.contextFor(11);
@@ -289,58 +427,57 @@ vows.describe("experiment").addBatch({
                 topic: function () {
                     var context = experiment.contextFor(22);
 
-                    return experiment.feature("feature one", context);
-                },
-                "should return valid variant": function (variant) {
-                    assert.equal(variant, "default");
-                },
-                "should return truthy value": function (variant) {
-                    assert.isTrue(variant ? true : false);
-                }
-            },// feature
-
-            "feature with no matching variant": {
-                topic: function () {
-                    var context = experiment.contextFor(50);
-
-                    return experiment.feature("feature one", context);
-                },
-                "should return valid variant": function (variant) {
-                    assert.isFalse(variant);
-                }
+                return experiment.feature("feature one", context);
             },
-
-            "feature with invalid feature": {
-                topic: function () {
-                    var context = experiment.contextFor(50);
-
-                    return experiment.feature("feature that doesn't exist", context);
-                },
-                "should return valid variant": function (variant) {
-                    assert.isFalse(variant);
-                }
+            "should return valid variant": function (variant) {
+                assert.equal(variant, "default");
             },
+            "should return truthy value": function (variant) {
+                assert.isTrue(variant ? true : false);
+            }
+        },// feature
 
-            "feature with always on": {
-                topic: function () {
-                    var context = experiment.contextFor(50);
+        "feature with no matching variant": {
+            topic: function () {
+                var context = experiment.contextFor(50);
 
-                    return experiment.feature("feature four", context);
-                },
-                "should return valid variant": function (variant) {
-                    assert.isTrue(!!variant);
-                }
+                return experiment.feature("feature one", context);
             },
+            "should return valid variant": function (variant) {
+                assert.isFalse(variant);
+            }
+        },
 
-            "feature with always off": {
-                topic: function () {
-                    var context = experiment.contextFor(50);
+        "feature with invalid feature": {
+            topic: function () {
+                var context = experiment.contextFor(50);
 
-                    return experiment.feature("feature five", context);
-                },
-                "should return false": function (variant) {
-                    assert.isFalse(variant);
-                }
+                return experiment.feature("feature that doesn't exist", context);
+            },
+            "should return valid variant": function (variant) {
+                assert.isFalse(variant);
+            }
+        },
+
+        "feature with always on": {
+            topic: function () {
+                var context = experiment.contextFor(50);
+
+                return experiment.feature("feature four", context);
+            },
+            "should return valid variant": function (variant) {
+                assert.isTrue(!!variant);
+            }
+        },
+
+        "feature with always off": {
+            topic: function () {
+                var context = experiment.contextFor(50);
+
+                return experiment.feature("feature five", context);
+            },
+            "should return false": function (variant) {
+                assert.isFalse(variant);
             }
         }
     }
