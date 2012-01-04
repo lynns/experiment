@@ -7,9 +7,9 @@ var assert = require("assert"),
 
 experiment.configure({
     experiments: {
-        "button color": {
-            "red button": "0-10%",
-            "green button": "11-20%"
+        "buttonColor": {
+            "redButton": "0-10%",
+            "greenButton": "11-20%"
         }
     }
 });
@@ -35,7 +35,7 @@ vows.describe("eco").addBatch({
         "with an experiment guarded by an `if` statement ": {
             topic: function (renderTemplate) {
                 var template = [
-                  '<% if @feature "button color/red button": %>',
+                  '<% if @feature "buttonColor/redButton": %>',
                   '    <button name="red"/>',
                   '<% end %>'
                 ].join("\n");
@@ -71,9 +71,9 @@ vows.describe("eco").addBatch({
         "with an experiment guarded by `else if` statements": {
             topic: function (renderTemplate) {
                 var template = [
-                    '<% if @feature "button color/red button": %>'
+                    '<% if @feature "buttonColor/redButton": %>'
                   , '  <a class="button error">Click</a>'
-                  , '<% else if @feature "button color/green button": %>'
+                  , '<% else if @feature "buttonColor/greenButton": %>'
                   , '  <a class="button go">Click</a>'
                   , '<% else: %>'
                   , '  <a class="button normal">Click</a>'

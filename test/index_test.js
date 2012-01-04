@@ -44,12 +44,12 @@ vows.describe("experiment").addBatch({
                 assert.ok(Group.byName("phase 3"));
             },
             "should create the specified experiments": function (err) {
-                assert.ok(Experiment.byName("feature one"));
-                assert.ok(Experiment.byName("feature two"));
-                assert.ok(Experiment.byName("feature three"));
+                assert.ok(Experiment.byName("featureOne"));
+                assert.ok(Experiment.byName("featureTwo"));
+                assert.ok(Experiment.byName("featureThree"));
             },
             "should create the specified variants": function (err) {
-                var featureThree = Experiment.byName("feature three");
+                var featureThree = Experiment.byName("featureThree");
                 assert.equal(featureThree.variants.length, 2);
             },
 
@@ -85,7 +85,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(11);
                             var data = "no";
 
-                            experiment.protect("feature one", context, function () {
+                            experiment.protect("featureOne", context, function () {
                                 data = "yes";
                             });
 
@@ -100,7 +100,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(22);
                             var data = "no";
 
-                            experiment.protect("feature one", context, function () {
+                            experiment.protect("featureOne", context, function () {
                                 data = "yes";
                             });
 
@@ -118,8 +118,8 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(22);
                             var data = "no";
 
-                            experiment.protect("feature three", context, {
-                                "variant one": function () {
+                            experiment.protect("featureThree", context, {
+                                "variantOne": function () {
                                     data = "yes";
                                 },
                                 "fallback": function () {
@@ -138,8 +138,8 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(11);
                             var data = "no";
 
-                            experiment.protect("feature three", context, {
-                                "variant one": function () {
+                            experiment.protect("featureThree", context, {
+                                "variantOne": function () {
                                     data = "yes";
                                 },
                                 "fallback": function () {
@@ -161,7 +161,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(22);
                             var data = "no";
 
-                            experiment.protect("feature three/variant one", context, function () {
+                            experiment.protect("featureThree/variantOne", context, function () {
                                 data = "yes";
                             });
 
@@ -176,7 +176,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(11);
                             var data = "no";
 
-                            experiment.protect("feature three/variant one", context, function () {
+                            experiment.protect("featureThree/variantOne", context, function () {
                                 data = "yes";
                             });
 
@@ -198,8 +198,8 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(22);
                             var data = "no";
 
-                            experiment.protect("feature three/variant one", context, {
-                                "variant one": function () {
+                            experiment.protect("featureThree/variantOne", context, {
+                                "variantOne": function () {
                                     data = "yes";
                                 },
                                 "fallback": function () {
@@ -218,8 +218,8 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(11);
                             var data = "no";
 
-                            experiment.protect("feature three/variant one", context, {
-                                "variant one": function () {
+                            experiment.protect("featureThree/variantOne", context, {
+                                "variantOne": function () {
                                     data = "yes";
                                 },
                                 "fallback": function () {
@@ -240,8 +240,8 @@ vows.describe("experiment").addBatch({
                 topic: function () {
                     var context = experiment.contextFor(11);
 
-                    var invited = experiment.select("feature three/variant one", context, {
-                        "variant one": function () {
+                    var invited = experiment.select("featureThree/variantOne", context, {
+                        "variantOne": function () {
                             return function (text, render) {
                                 return render(text, this);
                             };
@@ -278,7 +278,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(11);
                             var data = "no";
 
-                            if( experiment.variantFor("feature one", context) ) {
+                            if( experiment.variantFor("featureOne", context) ) {
                                 data = "yes";
                             };
 
@@ -293,7 +293,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(22);
                             var data = "no";
 
-                            if( experiment.variantFor("feature one", context) ) {
+                            if( experiment.variantFor("featureOne", context) ) {
                                 data = "yes";
                             };
 
@@ -311,7 +311,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(22);
                             var data = "no";
 
-                            if( "variant one" === experiment.variantFor("feature three", context) ) {
+                            if( "variantOne" === experiment.variantFor("featureThree", context) ) {
                                 data = "yes";
                             };
 
@@ -326,7 +326,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(11);
                             var data = "no";
 
-                            if( "variant one" === experiment.variantFor("feature three", context) ) {
+                            if( "variantOne" === experiment.variantFor("featureThree", context) ) {
                                 data = "yes";
                             };
 
@@ -344,7 +344,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(22);
                             var data = "no";
 
-                            if( experiment.variantFor("feature three/variant one", context) ) {
+                            if( experiment.variantFor("featureThree/variantOne", context) ) {
                                 data = "yes";
                             };
 
@@ -359,7 +359,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(11);
                             var data = "no";
 
-                            if( experiment.variantFor("feature three/variant one", context) ) {
+                            if( experiment.variantFor("featureThree/variantOne", context) ) {
                                 data = "yes";
                             };
 
@@ -381,7 +381,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(22);
                             var data = "no";
 
-                            if( "variant one" === experiment.variantFor("feature three/variant one", context) ) {
+                            if( "variantOne" === experiment.variantFor("featureThree/variantOne", context) ) {
                                 data = "yes";
                             };
 
@@ -396,7 +396,7 @@ vows.describe("experiment").addBatch({
                             var context = experiment.contextFor(11);
                             var data = "no";
 
-                            if( "variant one" === experiment.variantFor("feature three/variant one", context) ) {
+                            if( "variantOne" === experiment.variantFor("featureThree/variantOne", context) ) {
                                 data = "yes";
                             };
 
@@ -413,10 +413,10 @@ vows.describe("experiment").addBatch({
                 topic: function () {
                     var context = experiment.contextFor(11);
 
-                    return experiment.feature("feature three", context);
+                    return experiment.feature("featureThree", context);
                 },
                 "should return valid variant": function (variant) {
-                    assert.equal(variant, "variant one");
+                    assert.equal(variant, "variantOne");
                 },
                 "should return truthy value": function (variant) {
                     assert.isTrue(variant ? true : false);
@@ -427,7 +427,7 @@ vows.describe("experiment").addBatch({
                 topic: function () {
                     var context = experiment.contextFor(22);
 
-                return experiment.feature("feature one", context);
+                return experiment.feature("featureOne", context);
                 },
                 "should return valid variant": function (variant) {
                     assert.equal(variant, "default");
@@ -441,7 +441,7 @@ vows.describe("experiment").addBatch({
                 topic: function () {
                     var context = experiment.contextFor(50);
 
-                    return experiment.feature("feature one", context);
+                    return experiment.feature("featureOne", context);
                 },
                 "should return valid variant": function (variant) {
                     assert.isFalse(variant);
@@ -463,7 +463,7 @@ vows.describe("experiment").addBatch({
                 topic: function () {
                     var context = experiment.contextFor(50);
 
-                    return experiment.feature("feature four", context);
+                    return experiment.feature("featureFour", context);
                 },
                 "should return valid variant": function (variant) {
                     assert.isTrue(!!variant);
@@ -474,7 +474,7 @@ vows.describe("experiment").addBatch({
                 topic: function () {
                     var context = experiment.contextFor(50);
 
-                    return experiment.feature("feature five", context);
+                    return experiment.feature("featureFive", context);
                 },
                 "should return false": function (variant) {
                     assert.isFalse(variant);

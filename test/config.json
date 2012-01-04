@@ -6,13 +6,13 @@
         "phase 3": "20-60%"
     },
     "experiments": {
-        "feature one": "phase 1",
-        "feature two": ["family search", "3-5%"],
-        "feature three": {
-            "variant one": "0-20%",
-            "variant two": "21-100%"
+        "featureOne": "phase 1",
+        "featureTwo": ["family search", "3-5%"],
+        "featureThree": {
+            "variantOne": "0-20%",
+            "variantTwo": "21-100%"
         },
-        "feature four": true,
-        "feature five": false
+        "featureFour": true,
+        "featureFive": false
     }
 }
