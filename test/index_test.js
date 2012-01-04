@@ -428,57 +428,58 @@ vows.describe("experiment").addBatch({
                     var context = experiment.contextFor(22);
 
                 return experiment.feature("feature one", context);
+                },
+                "should return valid variant": function (variant) {
+                    assert.equal(variant, "default");
+                },
+                "should return truthy value": function (variant) {
+                    assert.isTrue(variant ? true : false);
+                }
+            },// feature
+
+            "feature with no matching variant": {
+                topic: function () {
+                    var context = experiment.contextFor(50);
+
+                    return experiment.feature("feature one", context);
+                },
+                "should return valid variant": function (variant) {
+                    assert.isFalse(variant);
+                }
             },
-            "should return valid variant": function (variant) {
-                assert.equal(variant, "default");
+
+            "feature with invalid feature": {
+                topic: function () {
+                    var context = experiment.contextFor(50);
+
+                    return experiment.feature("feature that doesn't exist", context);
+                },
+                "should return valid variant": function (variant) {
+                    assert.isFalse(variant);
+                }
             },
-            "should return truthy value": function (variant) {
-                assert.isTrue(variant ? true : false);
-            }
-        },// feature
 
-        "feature with no matching variant": {
-            topic: function () {
-                var context = experiment.contextFor(50);
+            "feature with always on": {
+                topic: function () {
+                    var context = experiment.contextFor(50);
 
-                return experiment.feature("feature one", context);
+                    return experiment.feature("feature four", context);
+                },
+                "should return valid variant": function (variant) {
+                    assert.isTrue(!!variant);
+                }
             },
-            "should return valid variant": function (variant) {
-                assert.isFalse(variant);
-            }
-        },
 
-        "feature with invalid feature": {
-            topic: function () {
-                var context = experiment.contextFor(50);
+            "feature with always off": {
+                topic: function () {
+                    var context = experiment.contextFor(50);
 
-                return experiment.feature("feature that doesn't exist", context);
-            },
-            "should return valid variant": function (variant) {
-                assert.isFalse(variant);
-            }
-        },
-
-        "feature with always on": {
-            topic: function () {
-                var context = experiment.contextFor(50);
-
-                return experiment.feature("feature four", context);
-            },
-            "should return valid variant": function (variant) {
-                assert.isTrue(!!variant);
-            }
-        },
-
-        "feature with always off": {
-            topic: function () {
-                var context = experiment.contextFor(50);
-
-                return experiment.feature("feature five", context);
-            },
-            "should return false": function (variant) {
-                assert.isFalse(variant);
-            }
+                    return experiment.feature("feature five", context);
+                },
+                "should return false": function (variant) {
+                    assert.isFalse(variant);
+                }
+            }  
         }
     }
 }).export(module);
