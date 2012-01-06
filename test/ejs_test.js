@@ -18,11 +18,11 @@ vows.describe("ejs").addBatch({
         topic: function() {
             var renderTemplate = function(template) {
                 var withUser = function(user) {
-                    var context = experiment.contextFor(user);
+                    var exps = experiment.readFor(experiment.contextFor(user));
                      return ejs.render(template, {
                         locals: {
                             experiment: experiment,
-                            context: context
+                            exps: exps
                         }
                     }).replace(/^\s\s*/, '').replace(/\s\s*$/, '');
                 }
@@ -33,7 +33,7 @@ vows.describe("ejs").addBatch({
         "with an experiment guarded by an `if` statement ": {
             topic: function (renderTemplate) {
                 var template = [
-                    '<% if( experiment.variantFor("buttonColor/redButton", context) ) { %>'
+                    '<% if( experiment.variantFor("buttonColor", exps) == "redButton" ) { %>'
                   , '  <button name="red"/>'
                   , '<% } %>'
                 ].join("\n");
@@ -69,7 +69,7 @@ vows.describe("ejs").addBatch({
         "with an experiment guarded by a `switch` statement ": {
             topic: function (renderTemplate) {
                 var template = [
-                    '<% switch( experiment.variantFor("buttonColor", context) ) { '
+                    '<% switch( experiment.variantFor("buttonColor", exps) ) { '
                   , '     case "redButton":'
                   , '%>'
                   , '       <button name="red"/>'

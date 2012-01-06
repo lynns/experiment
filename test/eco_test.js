@@ -19,10 +19,10 @@ vows.describe("eco").addBatch({
         topic: function() {
             var renderTemplate = function(template) {
                 var withUser = function(user) {
-                    var context = experiment.contextFor(user);
+                    var exps = experiment.readFor(experiment.contextFor(user));
                     var result = eco.render(template, {
                       feature:   function(name) {
-                          return experiment.feature(name, context);
+                          return experiment.feature(name, exps);
                       }
                     });
 
@@ -35,7 +35,7 @@ vows.describe("eco").addBatch({
         "with an experiment guarded by an `if` statement ": {
             topic: function (renderTemplate) {
                 var template = [
-                  '<% if @feature "buttonColor/redButton": %>',
+                  '<% if @feature("buttonColor") is "redButton": %>',
                   '    <button name="red"/>',
                   '<% end %>'
                 ].join("\n");
@@ -71,9 +71,9 @@ vows.describe("eco").addBatch({
         "with an experiment guarded by `else if` statements": {
             topic: function (renderTemplate) {
                 var template = [
-                    '<% if @feature "buttonColor/redButton": %>'
+                    '<% if @feature("buttonColor") is "redButton": %>'
                   , '  <a class="button error">Click</a>'
-                  , '<% else if @feature "buttonColor/greenButton": %>'
+                  , '<% else if @feature "buttonColor" == "greenButton": %>'
                   , '  <a class="button go">Click</a>'
                   , '<% else: %>'
                   , '  <a class="button normal">Click</a>'
