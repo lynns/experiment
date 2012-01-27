@@ -12,7 +12,7 @@
         "test": "vows test/*_test.js"
     },
     "engines": {
-        "node": "~0.4.7"
+        "node": ">=0.4.7"
     },
     "dependencies": {
         "usererror": "1.0.1"
