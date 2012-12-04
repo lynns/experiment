@@ -1,0 +1,24 @@
+{
+  "groups": {
+    "family search": [11, 22, 33, 44],
+    "phase 1": "20-30%",
+    "phase 2": "20-50%",
+    "phase 3": "20-60%"
+  },
+  "experiments": {
+    "featureOne": "phase 1",
+    "featureTwo": ["family search", "3-5%"],
+    "featureThree": {
+      "variantOne": "0-20%",
+      "variantTwo": "21-100%"
+    },
+    "featureFour": true,
+    "featureFive": false
+  },
+  "envs": {
+    "test": {
+      "featureFour": false
+    }
+  },
+  "DEPLOYMENT_ENV_VARIABLE": "TARGET_ENV"
+}

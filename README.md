@@ -81,8 +81,10 @@ It may have any of the following values:
   * An object containing the names of variants
 
 Each property of the `envs` object specifies the name of a deployment environment.
-It may have any value and is resolved against the runtime environment variable `TARGET_ENV`.
-This property allows you to override experiment settings based on the runtime deployment
+It may have any value and is resolved against the runtime environment variable `TARGET_ENV` by default.
+You may specify a different environment variable for determining what your app's runtime environment is
+by adding the `DEPLOYMENT_ENV_VARIABLE` property to your config file.
+The `envs` property allows you to override experiment settings based on the runtime deployment
 environment.  In the example above, the `featureFour` experiment would be on by default for
 all environments, except `prod` where the default has been overridden.
 
