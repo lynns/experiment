@@ -12,6 +12,7 @@ Make it easy:
     * user ID
     * group name
     * % range (user ID % 100 within range)
+  * to set default experiment values based on deployment environment
 
 Make it difficult:
 
@@ -37,6 +38,7 @@ following properties:
 
   - groups          An object keyed by the name of a group of users.
   - experiments     An object keyed by the names of the experiments.
+  - envs            An object keyed by deployment environment names (i.e., local, dev, test, prod).
 
 A sample configuration object might look like the following:
 
@@ -56,6 +58,11 @@ A sample configuration object might look like the following:
             },
             "featureFour": true
         }
+        "envs": {
+            "prod": {
+                "featureFour": false
+            }
+        }
     }
 
 Each property of the `groups` object specifies the name of a group of users. It
@@ -72,6 +79,14 @@ It may have any of the following values:
   * An array of group name(s) and/or a percentage of users
   * A boolean indicating if the experiment is on or off for all users
   * An object containing the names of variants
+
+Each property of the `envs` object specifies the name of a deployment environment.
+It may have any value and is resolved against the runtime environment variable `TARGET_ENV` by default.
+You may specify a different environment variable for determining what your app's runtime environment is
+by adding the `DEPLOYMENT_ENV_VARIABLE` property to your config file.
+The `envs` property allows you to override experiment settings based on the runtime deployment
+environment.  In the example above, the `featureFour` experiment would be on by default for
+all environments, except `prod` where the default has been overridden.
 
 If an experiment is configured with an object with several variants (the last
 option), each variant may specify any of the first two values in the above list.

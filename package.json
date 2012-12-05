@@ -1,27 +1,32 @@
 {
-    "author": "Michael Jackson <mjijackson@gmail.com>",
-    "name": "experiment",
-    "description": "A simple framework for running UI experiments in web apps",
-    "version": "0.1.0",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/mjijackson/experiment.git"
-    },
-    "main": "lib",
-    "scripts": {
-        "test": "vows test/*_test.js"
-    },
-    "engines": {
-        "node": ">=0.4.7"
-    },
-    "dependencies": {
-        "usererror": "1.0.1"
-    },
-    "devDependencies": {
-        "vows": "0.6.0",
-        "mustache": "0.3.1-dev",
-        "ejs": "0.5.0",
-        "eco": "1.1.0-rc-1"
-    },
-    "private": true
+  "author": "FamilySearch Web Developers",
+  "name": "experiment",
+  "description": "A simple framework for running UI experiments in web apps",
+  "version": "0.2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fs-webdev/experiment.git"
+  },
+  "main": "lib",
+  "scripts": {
+    "test": "vows test/*_test.js"
+  },
+  "engines": {
+    "node": ">=0.4.7"
+  },
+  "dependencies": {
+    "usererror": "1.0.1"
+  },
+  "devDependencies": {
+    "vows": "0.6.0",
+    "mustache": "0.3.1-dev",
+    "ejs": "0.5.0",
+    "eco": "1.1.0-rc-1"
+  },
+  "private": true,
+  "contributors": [
+    "Michael Jackson <mjijackson@gmail.com>",
+    "Tim Shadel <tim.shadel@familysearch.org>",
+    "Stephen Lynn <s.lynn@familysearch.org>"
+  ]
 }
